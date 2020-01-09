@@ -130,19 +130,6 @@ ggsave(here::here("Level_03.png"),
        width = 8, height = 4.5, dpi = 300)
 ```
 
-```{r}
-p1 <-
-  data.frame(pctg = runif(10, 0, 1)) %>%
-  mutate(id = row_number() %>% as.factor()) %>%
-  ggplot(aes(x = id, y = pctg)) +
-  geom_col() +
-  coord_flip() +
-  scale_y_continuous(labels = scales::percent)
-p1
-```
-
-
-
 # Level 4: coord_flip + fct_reorder
 
 ```{r}
@@ -289,15 +276,6 @@ tickets %>%
 ggsave(here::here("Level_07.png"),
        width = 8, height = 4.5, dpi = 300)
 ```
-
-```{r}
-p2 <-
-  p1 +
-  geom_text(aes(label = scales::percent(pctg)), nudge_y = 0.1)
-p2
-```
-
-
 # Level 8: Highlight A Key Field
 
 * Transform the data
@@ -476,18 +454,5 @@ ggsave(here::here("Level_10.png"),
        width = 8, height = 4.5, dpi = 300)
 ```
 
-比如显而易见的 axis title 就可以删除，标注了数据就可以删除网格线。
 
-```{r}
-p2 + 
-  theme(
-    axis.title = element_blank(),
-    panel.grid = element_blank(), # 失去网格
-    axis.text.x = element_blank() # 都有百分比了，x轴去掉
-  ) +
-  labs(
-    title = "各id的占比"
-  )
-# tidy up 的原则是删除 axis title 但是在 title 里面表示
-```
 
