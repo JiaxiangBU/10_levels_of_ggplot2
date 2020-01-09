@@ -17,20 +17,26 @@ pacman::p_load(
 
 
 ```{r}
-tickets <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-12-03/tickets.csv")
+# tickets <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-12-03/tickets.csv")
+# 网络问题不好，下载不下来。
+# dir.create("data")
+tickets <- readr::read_csv("data/tickets.csv")
 ```
 
+
 ```{r}
-tickets %>% 
-  mutate(violation_desc_condensed = str_remove(violation_desc,
-                                               " CC$"),
-         violation_desc_condensed = str_trim(violation_desc_condensed),
-         violation_desc_condensed = str_replace(violation_desc_condensed, "STOPPING", "STOP"),
-         violation_desc_condensed = str_replace(violation_desc_condensed, "HIWY", "HIGHWAY"),
-         violation_desc_condensed = str_replace(violation_desc_condensed, "PROH\\w+", "PROHIBITED"),
-         violation_desc_condensed = str_replace(violation_desc_condensed, "(PARK) PROHIBITED", "PARKING"),
-         violation_desc_condensed = str_replace(violation_desc_condensed, "PASSENGR", "PASSENGER"),
-         violation_desc_condensed = str_replace(violation_desc_condensed, "LOADNG", "LOADING")) %>% 
+tickets %>%
+  mutate(
+    violation_desc_condensed = str_remove(violation_desc,
+                                          " CC$"),
+    violation_desc_condensed = str_trim(violation_desc_condensed),
+    violation_desc_condensed = str_replace(violation_desc_condensed, "STOPPING", "STOP"),
+    violation_desc_condensed = str_replace(violation_desc_condensed, "HIWY", "HIGHWAY"),
+    violation_desc_condensed = str_replace(violation_desc_condensed, "PROH\\w+", "PROHIBITED"),
+    violation_desc_condensed = str_replace(violation_desc_condensed, "(PARK) PROHIBITED", "PARKING"),
+    violation_desc_condensed = str_replace(violation_desc_condensed, "PASSENGR", "PASSENGER"),
+    violation_desc_condensed = str_replace(violation_desc_condensed, "LOADNG", "LOADING")
+  ) %>%
   count(violation_desc_condensed) %>%
   filter(str_detect(violation_desc_condensed, "LOAD"))
 ```
@@ -98,7 +104,7 @@ ggsave(here::here("Level_02.png"),
        width = 8, height = 4.5, dpi = 300)
 ```
 
-# Level 3: scale_y_continuous + scales::comma
+# Level 3: y axis by scales
 
 ```{r}
 tickets %>% 
@@ -123,6 +129,19 @@ tickets %>%
 ggsave(here::here("Level_03.png"),
        width = 8, height = 4.5, dpi = 300)
 ```
+
+```{r}
+p1 <-
+  data.frame(pctg = runif(10, 0, 1)) %>%
+  mutate(id = row_number() %>% as.factor()) %>%
+  ggplot(aes(x = id, y = pctg)) +
+  geom_col() +
+  coord_flip() +
+  scale_y_continuous(labels = scales::percent)
+p1
+```
+
+
 
 # Level 4: coord_flip + fct_reorder
 
@@ -270,6 +289,14 @@ tickets %>%
 ggsave(here::here("Level_07.png"),
        width = 8, height = 4.5, dpi = 300)
 ```
+
+```{r}
+p2 <-
+  p1 +
+  geom_text(aes(label = scales::percent(pctg)), nudge_y = 0.1)
+p2
+```
+
 
 # Level 8: Highlight A Key Field
 
@@ -447,5 +474,20 @@ ggplot() +
 
 ggsave(here::here("Level_10.png"),
        width = 8, height = 4.5, dpi = 300)
+```
+
+比如显而易见的 axis title 就可以删除，标注了数据就可以删除网格线。
+
+```{r}
+p2 + 
+  theme(
+    axis.title = element_blank(),
+    panel.grid = element_blank(), # 失去网格
+    axis.text.x = element_blank() # 都有百分比了，x轴去掉
+  ) +
+  labs(
+    title = "各id的占比"
+  )
+# tidy up 的原则是删除 axis title 但是在 title 里面表示
 ```
 
